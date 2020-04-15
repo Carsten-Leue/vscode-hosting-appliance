@@ -2,16 +2,17 @@
   "name": "hosting-appliance",
   "version": "0.0.2",
   "description": "Code development for hosting appliance",
-  "main": "./out/extension.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:Carsten-Leue/vscode-hosting-appliance.git"
   },
+  "license": "MIT",
+  "main": "./out/extension.js",
   "scripts": {
     "compile": "tsc -p ./",
+    "deploy": "vsce publish --yarn",
     "lint": "eslint src --ext ts",
     "pretest": "yarn run compile && yarn run lint",
-    "deploy": "vsce publish --yarn",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "yarn run compile",
     "watch": "tsc -watch -p ./"
