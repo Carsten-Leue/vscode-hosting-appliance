@@ -1,7 +1,4 @@
 language: node_js
-os:
-  - osx
-  - linux
 node_js: 10
 
 install:
@@ -14,3 +11,9 @@ install:
 script:
   - yarn test 
 cache: yarn
+deploy:
+  provider: script
+  script: 
+    - yarn deploy -p $VSCODE_MARKETPLACE_TOKEN
+  on:
+    tags: true
