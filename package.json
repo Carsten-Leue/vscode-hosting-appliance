@@ -1,6 +1,6 @@
 {
   "name": "hosting-appliance",
-  "version": "0.0.3",
+  "version": "0.0.2",
   "description": "Code development for hosting appliance",
   "repository": {
     "type": "git",
@@ -10,6 +10,7 @@
   "main": "./out/extension.js",
   "scripts": {
     "compile": "tsc -p ./",
+    "deploy": "vsce publish --yarn",
     "lint": "eslint src --ext ts",
     "pretest": "yarn run compile && yarn run lint",
     "test": "node ./out/test/runTest.js",
@@ -32,6 +33,7 @@
     "glob": "^7.1.6",
     "mocha": "^7.1.1",
     "typescript": "^3.8.3",
+    "vsce": "^1.75.0",
     "vscode-test": "^1.3.0"
   },
   "engines": {

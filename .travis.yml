@@ -12,8 +12,9 @@ script:
   - yarn test 
 cache: yarn
 deploy:
+  skip_cleanup: true
   provider: script
   script: 
-    - npx vsce publish --yarn -p $VSCODE_MARKETPLACE_TOKEN
+    - yarn deploy -p $VSCODE_MARKETPLACE_TOKEN
   on:
     tags: true
