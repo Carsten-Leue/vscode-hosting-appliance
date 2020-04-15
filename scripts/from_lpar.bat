@@ -1,0 +1,1 @@
+rsync -avzc --no-perms --no-owner --no-group -e "ssh -i %USERPROFILE%/.ssh/id_rsa -F %USERPROFILE%/.ssh/config" --include-from=include.txt --exclude "*" zaas:/ "/cygdrive/c/temp/zaas"

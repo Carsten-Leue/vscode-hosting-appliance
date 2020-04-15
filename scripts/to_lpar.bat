@@ -1,0 +1,1 @@
+rsync -azvc -n --no-perms --no-owner --no-group -e "ssh -i %USERPROFILE%/.ssh/id_rsa -F %USERPROFILE%/.ssh/config -o 'StrictHostKeyChecking false'" --include-from=include.txt --exclude "*" "/cygdrive/c/temp/zaas/" zaas:/

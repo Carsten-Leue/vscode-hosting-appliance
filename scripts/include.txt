@@ -1,0 +1,12 @@
+- __pycache__
+- .vscode
+- *.gz
++ /usr
++ /usr/local
++ /usr/local/zACI
++ /usr/local/zACI/test
++ /usr/local/zACI/test/***
++ /usr/local/lib
++ /usr/local/lib/python3.6
++ /usr/local/lib/python3.6/dist-packages
++ /usr/local/lib/python3.6/dist-packages/***
