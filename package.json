@@ -73,11 +73,11 @@
       },
       {
         "command": "hosting-appliance.resetMapping",
-        "title": "HA: Reset filename mapping"
+        "title": "HA: Reset Filename Mapping"
       },
       {
         "command": "hosting-appliance.runUnitTest",
-        "title": "HA: Run single Unit Test"
+        "title": "HA: Run Single Unit Test"
       }
     ],
     "configuration": {
