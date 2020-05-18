@@ -4,7 +4,7 @@
   "description": "Code development for hosting appliance",
   "repository": {
     "type": "git",
-    "url": "git@github.com:Carsten-Leue/vscode-hosting-appliance.git"
+    "url": "https://github.com/Carsten-Leue/vscode-hosting-appliance"
   },
   "license": "MIT",
   "main": "./out/extension.js",
