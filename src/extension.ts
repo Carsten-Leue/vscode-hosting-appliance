@@ -1,7 +1,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, window } from 'vscode';
+import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
+
+import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createFindFilesCommand } from './commands/find.file';
+import { createResetMappingCommand } from './commands/reset.mapping';
+import { createRunUnitTestCommand } from './commands/run.unit.test';
+import { createShowConfigCommand } from './commands/show.config';
 import { EXT_NAME } from './constants';
 
 // this method is called when your extension is activated
@@ -13,26 +18,26 @@ export function activate(context: ExtensionContext) {
 
   const channel = window.createOutputChannel(EXT_NAME);
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = commands.registerCommand(
-    'hosting-appliance.helloWorld',
-    () => {
-      // The code you place here will be executed every time your command is executed
+  function addCommand(
+    aName: string,
+    aCreator: (
+      aChannel: OutputChannel,
+      aContext: ExtensionContext
+    ) => (...args: any[]) => any
+  ) {
+    context.subscriptions.push(
+      commands.registerCommand(
+        `${EXT_NAME}.${aName}`,
+        aCreator(channel, context)
+      )
+    );
+  }
 
-      // Display a message box to the user
-      window.showInformationMessage('Hello World from hosting-appliance!');
-    }
-  );
-
-  context.subscriptions.push(disposable);
-  context.subscriptions.push(
-    commands.registerCommand(
-      `${EXT_NAME}.findFiles`,
-      createFindFilesCommand(channel, context)
-    )
-  );
+  addCommand('findFiles', createFindFilesCommand);
+  addCommand('copyToLpar', createCopyToLparCommand);
+  addCommand('showConfig', createShowConfigCommand);
+  addCommand('resetMapping', createResetMappingCommand);
+  addCommand('runUnitTest', createRunUnitTestCommand);
 }
 
 // this method is called when your extension is deactivated

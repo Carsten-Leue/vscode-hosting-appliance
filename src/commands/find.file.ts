@@ -1,31 +1,20 @@
 import { parse } from 'path';
-import { reduce } from 'rxjs/operators';
 import { ExtensionContext, OutputChannel, window, workspace } from 'vscode';
 
-import { findFile } from '../utils/find.file';
-import { openSettings } from '../utils/settings';
+import { getLpar } from '../utils/settings';
+import { selectRemoteFile } from './copy.utils';
 
-export function createFindFilesCommand(
+export const createFindFilesCommand = (
   channel: OutputChannel,
   context: ExtensionContext
-) {
-  return () => {
-    // access our config
-    const { lpar } = workspace.getConfiguration('ha');
-
-    if (!lpar) {
-      window.showErrorMessage('LPAR not configured');
-      return openSettings();
-    }
-
+) => () => {
+  // get the lpar
+  return getLpar().then((lpar) => {
     const editor = window.activeTextEditor;
     if (editor && editor.document) {
       const { base } = parse(editor.document.uri.fsPath);
       // resulting files
-      const file$ = findFile(base, lpar)
-        .pipe(reduce((res: string[], item) => [...res, item], []))
-        .toPromise();
-      return window.showQuickPick(file$);
+      return selectRemoteFile(base, lpar);
     }
-  };
-}
+  });
+};

@@ -43,8 +43,12 @@
     "vscode": "^1.45.1"
   },
   "activationEvents": [
-    "onCommand:hosting-appliance.helloWorld",
-    "onCommand:hosting-appliance.findFiles"
+    "onCommand:hosting-appliance.findFiles",
+    "onCommand:hosting-appliance.copyToLpar",
+    "onCommand:hosting-appliance.copyFromLpar",
+    "onCommand:hosting-appliance.resetMapping",
+    "onCommand:hosting-appliance.runUnitTest",
+    "onCommand:hosting-appliance.showConfig"
   ],
   "categories": [
     "Other"
@@ -52,12 +56,28 @@
   "contributes": {
     "commands": [
       {
-        "command": "hosting-appliance.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "hosting-appliance.findFiles",
         "title": "HA: Find Remote Files"
+      },
+      {
+        "command": "hosting-appliance.showConfig",
+        "title": "HA: Show Configuration"
+      },
+      {
+        "command": "hosting-appliance.copyToLpar",
+        "title": "HA: local -> LPAR"
+      },
+      {
+        "command": "hosting-appliance.copyFromLpar",
+        "title": "HA: LPAR -> local"
+      },
+      {
+        "command": "hosting-appliance.resetMapping",
+        "title": "HA: Reset filename mapping"
+      },
+      {
+        "command": "hosting-appliance.runUnitTest",
+        "title": "HA: Run single Unit Test"
       }
     ],
     "configuration": {
