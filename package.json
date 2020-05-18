@@ -19,20 +19,23 @@
   },
   "dependencies": {
     "cross-spawn": "^7.0.2",
-    "fs-extra": "^9.0.0"
+    "fs-extra": "^9.0.0",
+    "byline": "^5.0.0",
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
-    "@types/cross-spawn": "^6.0.1",
+    "@types/cross-spawn": "^6.0.2",
     "@types/glob": "^7.1.1",
+    "@types/byline": "^4.2.32",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^13.11.0",
-    "@types/vscode": "^1.44.0",
-    "@typescript-eslint/eslint-plugin": "^2.26.0",
-    "@typescript-eslint/parser": "^2.26.0",
-    "eslint": "^6.8.0",
+    "@types/node": "^14.0.1",
+    "@types/vscode": "^1.45.1",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "eslint": "^7.0.0",
     "glob": "^7.1.6",
-    "mocha": "^7.1.1",
-    "typescript": "^3.8.3",
+    "mocha": "^7.1.2",
+    "typescript": "^3.9.2",
     "vsce": "^1.75.0",
     "vscode-test": "^1.3.0"
   },
@@ -40,7 +43,8 @@
     "vscode": "^1.44.0"
   },
   "activationEvents": [
-    "onCommand:hosting-appliance.helloWorld"
+    "onCommand:hosting-appliance.helloWorld",
+    "onCommand:hosting-appliance.findFiles"
   ],
   "categories": [
     "Other"
@@ -50,8 +54,21 @@
       {
         "command": "hosting-appliance.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "hosting-appliance.findFiles",
+        "title": "HA: Find Remote Files"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "hosting-appliance",
+      "properties": {
+        "ha.lpar": {
+          "type": "string",
+          "description": "Name of the LPAR to work against. This might also be an SSH configuration name."
+        }
+      }
+    }
   },
   "displayName": "hosting-appliance",
   "icon": "images/icon.png",
