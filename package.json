@@ -1,6 +1,6 @@
 {
   "name": "hosting-appliance",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Code development for hosting appliance",
   "repository": {
     "type": "git",
@@ -59,22 +59,22 @@
       {
         "command": "hosting-appliance.findFiles",
         "category": "HA",
-        "title": "\ud83d\udd0d Find Remote Files"
+        "title": "🔍 Find Remote Files"
       },
       {
         "command": "hosting-appliance.showConfig",
         "category": "HA",
-        "title": "\u2699\ufe0f Show Configuration"
+        "title": "⚙️ Show Configuration"
       },
       {
         "command": "hosting-appliance.copyToLpar",
         "category": "HA",
-        "title": "\u2190 local \u2190 LPAR"
+        "title": "← local ← LPAR"
       },
       {
         "command": "hosting-appliance.copyFromLpar",
         "category": "HA",
-        "title": "\u2192 LPAR \u2190 local"
+        "title": "→ LPAR ← local"
       },
       {
         "command": "hosting-appliance.resetMapping",
@@ -84,12 +84,12 @@
       {
         "command": "hosting-appliance.runUnitTest",
         "category": "HA",
-        "title": "\ud83e\uddea Run Single Unit Test"
+        "title": "🧪 Run Single Unit Test"
       },
       {
         "command": "hosting-appliance.restartServices",
         "category": "HA",
-        "title": "\u21BB Restart Services"
+        "title": "↻ Restart Services"
       }
     ],
     "configuration": {
