@@ -58,31 +58,38 @@
     "commands": [
       {
         "command": "hosting-appliance.findFiles",
-        "title": "HA: Find Remote Files"
+        "category": "HA",
+        "title": "\ud83d\udd0d Find Remote Files"
       },
       {
         "command": "hosting-appliance.showConfig",
-        "title": "HA: Show Configuration"
+        "category": "HA",
+        "title": "\u2699\ufe0f Show Configuration"
       },
       {
         "command": "hosting-appliance.copyToLpar",
-        "title": "HA: local -> LPAR"
+        "category": "HA",
+        "title": "\u2190 local \u2190 LPAR"
       },
       {
         "command": "hosting-appliance.copyFromLpar",
-        "title": "HA: LPAR -> local"
+        "category": "HA",
+        "title": "\u2192 LPAR \u2190 local"
       },
       {
         "command": "hosting-appliance.resetMapping",
-        "title": "HA: Reset Filename Mapping"
+        "category": "HA",
+        "title": "Reset Filename Mapping"
       },
       {
         "command": "hosting-appliance.runUnitTest",
-        "title": "HA: Run Single Unit Test"
+        "category": "HA",
+        "title": "\ud83e\uddea Run Single Unit Test"
       },
       {
         "command": "hosting-appliance.restartServices",
-        "title": "HA: Restart Services"
+        "category": "HA",
+        "title": "\u21BB Restart Services"
       }
     ],
     "configuration": {
