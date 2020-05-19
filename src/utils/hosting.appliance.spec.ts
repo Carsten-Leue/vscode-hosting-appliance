@@ -1,6 +1,7 @@
 import { login, getRepositories } from './hosting.appliance';
 import { tap } from 'rxjs/operators';
 import { env } from 'process';
+import { expect } from 'chai';
 import { Observable } from 'rxjs';
 
 describe('appliance REST', () => {
@@ -11,7 +12,7 @@ describe('appliance REST', () => {
 
   it('should login', () => {
     return login(HA_USERNAME!, HA_PASSWORD!, HA_HOSTNAME!)
-      .pipe(tap((token) => expect(token).toBeDefined()))
+      .pipe(tap((token) => expect(token).not.to.be.undefined))
       .toPromise();
   });
 
