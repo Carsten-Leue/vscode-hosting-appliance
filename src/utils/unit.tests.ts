@@ -19,7 +19,7 @@ export function runTest(
   const channel = getOutputChannel(base);
   channel.show(true);
   // remove command
-  const command = `pytest --verbose "${aDstFile}"`;
+  const command = `pytest --verbose --durations=1 "${aDstFile}"`;
   // log statement
   const log = `Executing test command [${command}] ...`;
   // log this
