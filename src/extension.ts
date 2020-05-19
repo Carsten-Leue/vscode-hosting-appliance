@@ -4,6 +4,7 @@ import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createFindFilesCommand } from './commands/find.file';
+import { createGetRepositoriesCommand } from './commands/get.repositories';
 import { createResetMappingCommand } from './commands/reset.mapping';
 import { createRestartServicesCommand } from './commands/restart.services';
 import { createRunUnitTestCommand } from './commands/run.unit.test';
@@ -40,6 +41,7 @@ export function activate(context: ExtensionContext) {
   addCommand('resetMapping', createResetMappingCommand);
   addCommand('runUnitTest', createRunUnitTestCommand);
   addCommand('restartServices', createRestartServicesCommand);
+  addCommand('getRepositories', createGetRepositoriesCommand);
 }
 
 // this method is called when your extension is deactivated

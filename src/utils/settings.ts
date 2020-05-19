@@ -22,3 +22,23 @@ export function getLpar(): PromiseLike<string> {
   // success
   return Promise.resolve(lpar);
 }
+
+export function getUsername(): PromiseLike<string> {
+  const { https } = workspace.getConfiguration('ha');
+  // display
+  if (!https || !https.username) {
+    return openSettings().then(() => fail('Username not configured'));
+  }
+  // success
+  return Promise.resolve(https.username);
+}
+
+export function getPassword(): PromiseLike<string> {
+  const { https } = workspace.getConfiguration('ha');
+  // display
+  if (!https || !https.password) {
+    return openSettings().then(() => fail('Username not configured'));
+  }
+  // success
+  return Promise.resolve(https.password);
+}
