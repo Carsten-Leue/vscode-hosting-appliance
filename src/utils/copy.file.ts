@@ -1,7 +1,8 @@
 import { parse } from 'path';
-import { ignoreElements, endWith } from 'rxjs/operators';
+import { endWith, ignoreElements } from 'rxjs/operators';
 import { OutputChannel, Uri, window } from 'vscode';
 
+import { createLogger } from './logger';
 import { rxSpawn } from './shell';
 
 export function copyFileToLpar(
@@ -18,8 +19,8 @@ export function copyFileToLpar(
   // target
   const dst = `${aLpar}:${aDstFile}`;
   // use SCP command
-  const copy$ = rxSpawn('scp', ['-q', base, dst], { cwd: dir })
-    .pipe(ignoreElements(), endWith(aDstFile))
+  const copy$ = rxSpawn('scp', [base, dst], { cwd: dir })
+    .pipe(createLogger(aChannel), ignoreElements(), endWith(aDstFile))
     .toPromise();
   // set status bar text
   window.setStatusBarMessage(log, copy$);

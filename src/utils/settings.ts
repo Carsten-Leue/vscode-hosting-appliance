@@ -1,14 +1,16 @@
-import { ExtensionContext, OutputChannel, window, workspace } from 'vscode';
+import { commands, workspace } from 'vscode';
 
 import { EXT_NAME } from '../constants';
-import { commands } from 'vscode';
 
 function fail<T>(aMessage: string) {
   return Promise.reject<T>(new Error(aMessage));
 }
 
 export function openSettings() {
-  return commands.executeCommand('workbench.action.openSettings', EXT_NAME);
+  return commands.executeCommand(
+    'workbench.action.openSettings',
+    `@ext:carsten-leue.${EXT_NAME}`
+  );
 }
 
 export function getLpar(): PromiseLike<string> {

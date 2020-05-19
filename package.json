@@ -48,7 +48,8 @@
     "onCommand:hosting-appliance.copyFromLpar",
     "onCommand:hosting-appliance.resetMapping",
     "onCommand:hosting-appliance.runUnitTest",
-    "onCommand:hosting-appliance.showConfig"
+    "onCommand:hosting-appliance.showConfig",
+    "onCommand:hosting-appliance.restartServices"
   ],
   "categories": [
     "Other"
@@ -78,6 +79,10 @@
       {
         "command": "hosting-appliance.runUnitTest",
         "title": "HA: Run Single Unit Test"
+      },
+      {
+        "command": "hosting-appliance.restartServices",
+        "title": "HA: Restart Services"
       }
     ],
     "configuration": {

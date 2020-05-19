@@ -1,8 +1,9 @@
 import { parse } from 'path';
-import { ignoreElements, mapTo, tap, endWith } from 'rxjs/operators';
+import { endWith, ignoreElements } from 'rxjs/operators';
 import { ExtensionContext, OutputChannel, Uri, window } from 'vscode';
 
 import { getOutputChannel } from './channels';
+import { createLogger } from './logger';
 import { rxSpawn } from './shell';
 
 export function runTest(
@@ -25,11 +26,7 @@ export function runTest(
   aChannel.appendLine(log);
   // execute the command
   const exec$ = rxSpawn('ssh', [aLpar, command])
-    .pipe(
-      tap(([type, line]) => channel.appendLine(line)),
-      ignoreElements(),
-      endWith(aDstFile)
-    )
+    .pipe(createLogger(channel), ignoreElements(), endWith(aDstFile))
     .toPromise();
   // set status bar text
   window.setStatusBarMessage(log, exec$);
