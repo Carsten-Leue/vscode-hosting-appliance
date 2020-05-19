@@ -69,12 +69,12 @@
       {
         "command": "hosting-appliance.copyToLpar",
         "category": "HA",
-        "title": "← local ← LPAR"
+        "title": "→ local → LPAR (upload)"
       },
       {
         "command": "hosting-appliance.copyFromLpar",
         "category": "HA",
-        "title": "→ LPAR ← local"
+        "title": "← LPAR → local (download)"
       },
       {
         "command": "hosting-appliance.resetMapping",
