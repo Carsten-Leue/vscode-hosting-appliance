@@ -1,9 +1,19 @@
 import { parse } from 'path';
-import { endWith, ignoreElements } from 'rxjs/operators';
+import { endWith, ignoreElements, first } from 'rxjs/operators';
 import { OutputChannel, Uri, window } from 'vscode';
 
 import { createLogger } from './logger';
 import { rxSpawn } from './shell';
+import { bindNodeCallback } from 'rxjs';
+import { copyFile } from 'fs';
+
+const rxCopyFile = bindNodeCallback(copyFile);
+
+export function copyLocalFile(aSrc: string, aDst: string): Thenable<string> {
+  return rxCopyFile(aSrc, aDst)
+    .toPromise()
+    .then(() => aDst);
+}
 
 export function copyFileToLpar(
   aSrcFile: Uri,

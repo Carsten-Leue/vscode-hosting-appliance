@@ -10,6 +10,7 @@ import { createRestartServicesCommand } from './commands/restart.services';
 import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { EXT_NAME } from './constants';
+import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -42,6 +43,7 @@ export function activate(context: ExtensionContext) {
   addCommand('runUnitTest', createRunUnitTestCommand);
   addCommand('restartServices', createRestartServicesCommand);
   addCommand('getRepositories', createGetRepositoriesCommand);
+  addCommand('syncWithVenv', createSyncWithVEnvCommand);
 }
 
 // this method is called when your extension is deactivated

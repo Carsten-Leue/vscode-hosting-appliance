@@ -31,7 +31,7 @@
     "@types/cross-spawn": "^6.0.2",
     "@types/glob": "^7.1.1",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^14.0.1",
+    "@types/node": "^14.0.4",
     "@types/vscode": "^1.45.1",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
@@ -40,7 +40,7 @@
     "glob": "^7.1.6",
     "mocha": "^7.1.2",
     "ts-node": "^8.10.1",
-    "typescript": "^3.9.2",
+    "typescript": "^3.9.3",
     "vsce": "^1.75.0",
     "vscode-test": "^1.3.0"
   },
@@ -55,7 +55,8 @@
     "onCommand:hosting-appliance.runUnitTest",
     "onCommand:hosting-appliance.showConfig",
     "onCommand:hosting-appliance.restartServices",
-    "onCommand:hosting-appliance.getRepositories"
+    "onCommand:hosting-appliance.getRepositories",
+    "onCommand:hosting-appliance.syncWithVenv"
   ],
   "categories": [
     "Other"
@@ -101,6 +102,11 @@
         "command": "hosting-appliance.getRepositories",
         "category": "HA",
         "title": "List Repositories"
+      },
+      {
+        "command": "hosting-appliance.syncWithVenv",
+        "category": "HA",
+        "title": "Sync with Virtual Environment"
       }
     ],
     "configuration": {
