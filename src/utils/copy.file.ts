@@ -9,6 +9,14 @@ import { copyFile } from 'fs';
 
 const rxCopyFile = bindNodeCallback(copyFile);
 
+/**
+ * Copies a file from an existing source location to an existing target location
+ *
+ * @param aSrc - the source location
+ * @param aDst - the target location
+ *
+ * @returns the target file
+ */
 export function copyLocalFile(aSrc: string, aDst: string): Thenable<string> {
   return rxCopyFile(aSrc, aDst)
     .toPromise()

@@ -2,7 +2,11 @@ import { Observable, UnaryFunction } from 'rxjs';
 import { first, map, switchMap } from 'rxjs/operators';
 import { QuickPickItem, window } from 'vscode';
 
-import { getRepositories, RepositoriesDefShort, RepositoryDefShort } from './hosting.appliance';
+import {
+  getRepositories,
+  RepositoriesDefShort,
+  RepositoryDefShort,
+} from './hosting.appliance';
 import { getHostnameFromSshConfig } from './ssh';
 
 export interface RepositoryPick extends QuickPickItem {
@@ -48,5 +52,5 @@ export function selectRepository(
   const log = `Loading repositories for ${aLpar} ...`;
   window.setStatusBarMessage(log, reps$);
   // show the pick
-  return window.showQuickPick(reps$);
+  return window.showQuickPick(reps$, { placeHolder: 'Repository' });
 }

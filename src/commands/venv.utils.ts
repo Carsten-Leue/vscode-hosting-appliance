@@ -33,11 +33,11 @@ function unboxUndefined(aValue: string): string | undefined {
  *
  * @returns the root of the virtual environment or undefined
  */
-export function getVirtualEnvironmentDir(
+async function getVirtualEnvironmentCacheMiss(
   aFileName: Uri,
   aChannel: OutputChannel,
   aContext: ExtensionContext
-): Thenable<string | undefined> {
+) {
   // locate the workspace
   const relPath = workspace.asRelativePath(aFileName);
   // cache key
@@ -51,19 +51,48 @@ export function getVirtualEnvironmentDir(
     // log this
     aChannel.appendLine(`Reading venv ${relPath} -> ${root} from cache.`);
     // return the cached version
-    return Promise.resolve(root);
+    return root;
   }
   // locate the root directory
   const fullPath = aFileName.fsPath;
   const rootDir = fullPath.substr(0, fullPath.length - relPath.length - 1);
   // locate the file
-  return getVirtualEnvironment(fullPath, rootDir)
+  const result = await getVirtualEnvironment(fullPath, rootDir)
     .pipe(first())
-    .toPromise()
-    .then((result) => {
-      // log this
-      aChannel.appendLine(`Updating venv ${relPath} -> ${result}.`);
-      // update the result
-      return memento.update(key, boxUndefined(result)).then(() => result);
-    });
+    .toPromise();
+  // log this
+  aChannel.appendLine(`Updating venv ${relPath} -> ${result}.`);
+  // update the result
+  await memento.update(key, boxUndefined(result));
+  // ok
+  return result;
+}
+
+const VENV_CACHE: Record<string, Thenable<string | undefined>> = {};
+
+/**
+ * Returns the root of the virtual environment or undefined if there is none
+ *
+ * @param aFileName - the file URI
+ * @param aChannel - the debug channel
+ * @param aContext - the extension context for caching
+ *
+ * @returns the root of the virtual environment or undefined
+ */
+export function getVirtualEnvironmentDir(
+  aFileName: Uri,
+  aChannel: OutputChannel,
+  aContext: ExtensionContext
+): Thenable<string | undefined> {
+  // key
+  const key = aFileName.toString();
+  // lookup in the cache
+  return (
+    VENV_CACHE[key] ||
+    (VENV_CACHE[key] = getVirtualEnvironmentCacheMiss(
+      aFileName,
+      aChannel,
+      aContext
+    ))
+  );
 }

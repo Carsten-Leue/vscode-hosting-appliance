@@ -7,20 +7,17 @@ import { getActiveDocument, getRemoteFile } from './copy.utils';
 export const createCopyToLparCommand = (
   channel: OutputChannel,
   context: ExtensionContext
-) => () => {
+) => async () => {
   // get some configs
-  const lpar$ = getLpar();
-  const uri$ = getActiveDocument();
+  const [lpar, uri] = await Promise.all([getLpar(), getActiveDocument()]);
   // locate the file
-  const file$ = Promise.all([uri$, lpar$]).then(([uri, lpar]) =>
-    getRemoteFile(uri, lpar, channel, context)
-  );
-  // copy
-  return Promise.all([uri$, file$, lpar$])
-    .then(([uri, file, lpar]) => maybeCopyFileToLpar(uri, file, lpar, channel))
-    .then((dstFile) =>
-      dstFile
-        ? window.showInformationMessage(`Successfully updated ${dstFile}.`)
-        : window.showWarningMessage(`Nothing copied.`)
-    );
+  const file = await getRemoteFile(uri, lpar, channel, context);
+  // target file
+  const dstUri = await maybeCopyFileToLpar(uri, file, lpar, channel);
+  // handle message
+  if (dstUri) {
+    await window.showInformationMessage(`Successfully updated [${dstUri}].`);
+  } else {
+    await window.showWarningMessage(`Nothing copied.`);
+  }
 };

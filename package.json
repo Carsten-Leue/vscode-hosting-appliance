@@ -106,7 +106,7 @@
       {
         "command": "hosting-appliance.syncWithVenv",
         "category": "HA",
-        "title": "Sync with Virtual Environment"
+        "title": "📄 Sync with Virtual Environment"
       }
     ],
     "configuration": {

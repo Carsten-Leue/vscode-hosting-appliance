@@ -1,10 +1,20 @@
 import { parse } from 'path';
 import { reduce } from 'rxjs/operators';
-import { ExtensionContext, Memento, OutputChannel, QuickPickItem, RelativePattern, Uri, window, workspace } from 'vscode';
+import {
+  ExtensionContext,
+  Memento,
+  OutputChannel,
+  QuickPickItem,
+  RelativePattern,
+  Uri,
+  window,
+  workspace,
+} from 'vscode';
 
 import { copyLocalFile } from '../utils/copy.file';
 import { findFile } from '../utils/find.file';
 import { getVirtualEnvironmentDir } from './venv.utils';
+import { timing } from '../utils/timer';
 
 const SEED = 2;
 
@@ -119,7 +129,7 @@ export function getRemoteFile(
     .pipe(reduce((res: string[], item) => [...res, item], []))
     .toPromise();
   // update
-  const selected$ = window.showQuickPick(file$);
+  const selected$ = window.showQuickPick(file$, { placeHolder: 'Remote File' });
   // if selected update the memento
   return selected$.then((selectedResult) => {
     // in case there exists a selection, update it
@@ -153,7 +163,7 @@ export function selectRemoteFile(aName: string, aLpar: string) {
   const file$ = findFile(aName, aLpar)
     .pipe(reduce((res: string[], item) => [...res, item], []))
     .toPromise();
-  return window.showQuickPick(file$);
+  return window.showQuickPick(file$, { placeHolder: 'Remote File' });
 }
 
 interface QuickPickFile extends QuickPickItem {
@@ -213,7 +223,9 @@ function getLocalFileName(
     .then((result) => result.filter(Boolean))
     .then((result) => result.map((uri) => createQuickPickFile(uri!)));
   // update
-  const selected$ = window.showQuickPick(localFiles$);
+  const selected$ = window.showQuickPick(localFiles$, {
+    placeHolder: 'Local File',
+  });
   // if selected update the memento
   return selected$.then((selectedResult) => {
     // in case there exists a selection, update it
@@ -272,8 +284,8 @@ function updateLocalFromVirtual(
   );
   // show in the status bar
   window.setStatusBarMessage(`Updating local file from ${aVirtual} ...`, copy$);
-  // done
-  return copy$;
+  // some timing
+  return timing(aChannel, 'updateLocalFromVirtual', copy$);
 }
 
 function updateVirtualFromLocal(
@@ -312,7 +324,7 @@ export function syncLocal(
     result ? result : Promise.reject('Please select a remote file.')
   );
   // check what direction to update
-  return Promise.all<string | undefined, string>([
+  const result$ = Promise.all<string | undefined, string>([
     venv$,
     remote$,
   ]).then(([venv, remote]) =>
@@ -320,4 +332,6 @@ export function syncLocal(
       ? updateLocalFromVirtual(aFileName, remote, aLpar, aChannel, aContext)
       : updateVirtualFromLocal(aFileName, remote, aLpar, aChannel, aContext)
   );
+  // some timing
+  return timing(aChannel, 'syncLocal', result$);
 }

@@ -2,8 +2,15 @@ import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 import { rxSpawn, SPAWN_OUTPUT_TYPE } from './shell';
-import { Uri, ExtensionContext, Memento } from 'vscode';
 
+/**
+ * Locates file with the specified name on the remote LPAR using SSH
+ *
+ * @param aName - name of the file to find
+ * @param aLpar - identifier of the LPAR, we assume that `ssh LPAR` works
+ *
+ * @returns an observable of the lines
+ */
 export function findFile(aName: string, aLpar: string): Observable<string> {
   // build the command
   const finder = `find /usr -name "${aName}"`;
