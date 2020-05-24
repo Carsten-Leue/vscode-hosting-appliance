@@ -5,9 +5,22 @@ import { OutputChannel, Uri, window } from 'vscode';
 import { createLogger } from './logger';
 import { rxSpawn } from './shell';
 import { bindNodeCallback } from 'rxjs';
-import { copyFile } from 'fs';
+import { mkdir, copyFile, PathLike, MakeDirectoryOptions } from 'fs';
 
 const rxCopyFile = bindNodeCallback(copyFile);
+const rxMkDir = bindNodeCallback<PathLike, MakeDirectoryOptions>(mkdir);
+
+/**
+ * Recurvisely create the directory
+ * 
+ * @param aDir - target directory
+ * @returns the target directory
+ */
+export function makeDir(aDir: string): Thenable<string> {
+  return rxMkDir(aDir, { recursive: true })
+    .toPromise()
+    .then(() => aDir);
+}
 
 /**
  * Copies a file from an existing source location to an existing target location

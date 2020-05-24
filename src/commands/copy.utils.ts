@@ -1,4 +1,4 @@
-import { parse } from 'path';
+import { isAbsolute, parse } from 'path';
 import { reduce } from 'rxjs/operators';
 import {
   ExtensionContext,
@@ -9,14 +9,15 @@ import {
   Uri,
   window,
   workspace,
+  commands,
 } from 'vscode';
 
-import { copyLocalFile } from '../utils/copy.file';
+import { copyLocalFile, makeDir } from '../utils/copy.file';
 import { findFile } from '../utils/find.file';
 import { getVirtualEnvironmentDir } from './venv.utils';
 import { timing } from '../utils/timer';
 
-const SEED = 2;
+const SEED = 4;
 
 /**
  * Returns the key for this mapping of local file to remote file
@@ -39,7 +40,19 @@ function getLocalToRemoteKey(aLpar: string, aRelName: string): string {
  * @returns the key
  */
 function getRemoteToLocalKey(aLpar: string, aRemote: string): string {
-  return `${SEED}:${aRemote}:[${aLpar}]`;
+  return `${SEED}:local:${aRemote}:[${aLpar}]`;
+}
+
+/**
+ * Returns the key for the inverse mapping from remote to venv file
+ *
+ * @param aLpar  - the name of the LPAR
+ * @param aRemote - the remote file
+ *
+ * @returns the key
+ */
+function getRemoteToVEnvKey(aLpar: string, aRemote: string): string {
+  return `${SEED}:venv:${aRemote}:[${aLpar}]`;
 }
 
 function updateRemoteToLocal(
@@ -140,15 +153,15 @@ export function getRemoteFile(
       );
       // update the mapping from local to remote
       const remote$ = updateLocalToRemote(memento, localKey, selectedResult);
-      // only update the mapping from remote to local if the local file is not in a virtual environment
+      // map the remote key to either the local or the virtual environment
       const local$ = venv$.then((venv) =>
-        venv
-          ? undefined
-          : updateRemoteToLocal(
-              memento,
-              getRemoteToLocalKey(aLpar, selectedResult),
-              relPath
-            )
+        updateRemoteToLocal(
+          memento,
+          venv
+            ? getRemoteToVEnvKey(aLpar, selectedResult)
+            : getRemoteToLocalKey(aLpar, selectedResult),
+          relPath
+        )
       );
       // continue
       return Promise.all([remote$, local$]).then(() => selectedResult);
@@ -181,22 +194,73 @@ function createQuickPickFile(aUri: Uri): QuickPickFile {
   };
 }
 
+const DIST_PACKAGES = '/dist-packages/';
+
+function openPythonSettings() {
+  return commands.executeCommand(
+    'workbench.action.openSettings',
+    `@ext:ms-python.python`
+  );
+}
+
+async function guessVirtualEnvironmentFiles(
+  aRemote: string,
+  aScope: Uri,
+  aChannel: OutputChannel,
+  aContext: ExtensionContext
+) {
+  // split the remote path
+  const idx = aRemote.indexOf(DIST_PACKAGES);
+  if (idx < 0) {
+    throw new Error(
+      `Unable to locate the [${DIST_PACKAGES}] segment in [${aRemote}].`
+    );
+  }
+  // suffix
+  const suffix = aRemote.substr(idx + DIST_PACKAGES.length);
+  // locate the virtual environment root
+  const config = workspace.getConfiguration('python', aScope);
+  // access
+  const path = config.get<string | undefined>('pythonPath');
+  if (!path) {
+    await openPythonSettings();
+    throw new Error('Python path not configured.');
+  }
+  // get the root directory from the python path
+  const pythonUri = isAbsolute(path)
+    ? Uri.file(path)
+    : Uri.joinPath(aScope, path);
+  const venv = await getVirtualEnvironmentDir(pythonUri, aChannel, aContext);
+  // bail out if we could not find the environment
+  if (!venv) {
+    throw new Error(`Unable to locate the virtual environment from [${path}].`);
+  }
+  // append
+  const venvUri = Uri.file(venv);
+  const localUri = Uri.joinPath(venvUri, suffix);
+  // returns the list
+  return [localUri];
+}
+
 function getLocalFileName(
-  aVirtual: Uri,
+  aSrc: Uri,
   aRemote: string,
   aLpar: string,
   aChannel: OutputChannel,
-  aContext: ExtensionContext
+  aContext: ExtensionContext,
+  aVirtual: boolean
 ): Thenable<Uri> {
   // try to locate the file in the workspace
-  const wsFolder = workspace.getWorkspaceFolder(aVirtual);
+  const wsFolder = workspace.getWorkspaceFolder(aSrc);
   if (!wsFolder) {
-    return Promise.reject(`Unable to get the workspace folder for ${aVirtual}`);
+    return Promise.reject(`Unable to get the workspace folder for ${aSrc}`);
   }
   // the memento
   const memento = aContext.workspaceState;
   // check if we can find a local file
-  const key = getRemoteToLocalKey(aLpar, aRemote);
+  const key = aVirtual
+    ? getRemoteToVEnvKey(aLpar, aRemote)
+    : getRemoteToLocalKey(aLpar, aRemote);
   const cachedLocal = memento.get<string>(key);
   if (cachedLocal) {
     // log this
@@ -205,7 +269,7 @@ function getLocalFileName(
     return Promise.resolve(Uri.joinPath(wsFolder.uri, cachedLocal));
   }
   // locate the file in the workspace
-  const { base } = parse(aVirtual.fsPath);
+  const { base } = parse(aSrc.fsPath);
   const files$ = workspace.findFiles(
     new RelativePattern(wsFolder, `**/${base}`)
   );
@@ -215,12 +279,22 @@ function getLocalFileName(
       Promise.all(
         result.map((uri) =>
           getVirtualEnvironmentDir(uri, aChannel, aContext).then((dir) =>
-            dir ? undefined : uri
+            (dir && aVirtual) || (!dir && !aVirtual) ? uri : undefined
           )
         )
       )
     )
     .then((result) => result.filter(Boolean))
+    .then((result) =>
+      result.length === 0 && aVirtual
+        ? guessVirtualEnvironmentFiles(
+            aRemote,
+            wsFolder.uri,
+            aChannel,
+            aContext
+          )
+        : result
+    )
     .then((result) => result.map((uri) => createQuickPickFile(uri!)));
   // update
   const selected$ = window.showQuickPick(localFiles$, {
@@ -237,11 +311,7 @@ function getLocalFileName(
         `Updating ${aRemote} -> ${relPath} from user selection.`
       );
       // update the mapping from local to remote
-      const local$ = updateRemoteToLocal(
-        memento,
-        getRemoteToLocalKey(aLpar, aRemote),
-        relPath
-      );
+      const local$ = updateRemoteToLocal(memento, key, relPath);
       // update the mapping from remote to local
       const remote$ = updateLocalToRemote(
         memento,
@@ -267,35 +337,70 @@ function copyUriToUri(
   return copyLocalFile(aSrc.fsPath, aDst.fsPath).then(() => aDst);
 }
 
-function updateLocalFromVirtual(
+function copyUriToUriDir(
+  aSrc: Uri,
+  aDst: Uri,
+  aChannel: OutputChannel
+): Thenable<Uri> {
+  // get the target root
+  const { dir } = parse(aDst.fsPath);
+  // make dire
+  return makeDir(dir).then(() => copyUriToUri(aSrc, aDst, aChannel));
+}
+
+async function updateLocalFromVirtual(
   aVirtual: Uri,
   aRemote: string,
   aLpar: string,
   aChannel: OutputChannel,
   aContext: ExtensionContext
-): Thenable<Uri> {
+) {
   // log this
   aChannel.appendLine(`updateLocalFromVirtual ${aVirtual} ${aRemote} ...`);
   // get the local filename to update
-  const local$ = getLocalFileName(aVirtual, aRemote, aLpar, aChannel, aContext);
-  // execute the copy
-  const copy$ = local$.then((dstUri) =>
-    copyUriToUri(aVirtual, dstUri, aChannel)
+  const dstUri = await getLocalFileName(
+    aVirtual,
+    aRemote,
+    aLpar,
+    aChannel,
+    aContext,
+    false
   );
+  // execute the copy
+  const copy$ = copyUriToUri(aVirtual, dstUri, aChannel);
   // show in the status bar
   window.setStatusBarMessage(`Updating local file from ${aVirtual} ...`, copy$);
   // some timing
   return timing(aChannel, 'updateLocalFromVirtual', copy$);
 }
 
-function updateVirtualFromLocal(
+async function updateVirtualFromLocal(
   aLocal: Uri,
   aRemote: string,
   aLpar: string,
   aChannel: OutputChannel,
   aContext: ExtensionContext
-): Thenable<Uri> {
-  return Promise.reject(new Error('TODO not implemented, yet'));
+) {
+  // log this
+  aChannel.appendLine(`updateVirtualFromLocal ${aLocal} ${aRemote} ...`);
+  // get the local filename to update
+  const dstUri = await getLocalFileName(
+    aLocal,
+    aRemote,
+    aLpar,
+    aChannel,
+    aContext,
+    true
+  );
+  // execute the copy
+  const copy$ = copyUriToUriDir(aLocal, dstUri, aChannel);
+  // show in the status bar
+  window.setStatusBarMessage(
+    `Updating virtual environment file from ${aLocal} ...`,
+    copy$
+  );
+  // some timing
+  return timing(aChannel, 'updateVirtualFromLocal', copy$);
 }
 
 /**
@@ -306,7 +411,7 @@ function updateVirtualFromLocal(
  * @param aChannel - the debug channel
  * @param aContext - the extension context for caching
  */
-export function syncLocal(
+export async function syncLocal(
   aFileName: Uri,
   aLpar: string,
   aChannel: OutputChannel,
@@ -315,23 +420,14 @@ export function syncLocal(
   // test if the file is in a virtual environment
   const venv$ = getVirtualEnvironmentDir(aFileName, aChannel, aContext);
   // locate the matching remote file
-  const remote$: Thenable<string> = getRemoteFile(
-    aFileName,
-    aLpar,
-    aChannel,
-    aContext
-  ).then((result) =>
-    result ? result : Promise.reject('Please select a remote file.')
-  );
-  // check what direction to update
-  const result$ = Promise.all<string | undefined, string>([
-    venv$,
-    remote$,
-  ]).then(([venv, remote]) =>
-    venv
-      ? updateLocalFromVirtual(aFileName, remote, aLpar, aChannel, aContext)
-      : updateVirtualFromLocal(aFileName, remote, aLpar, aChannel, aContext)
-  );
+  const remote = await getRemoteFile(aFileName, aLpar, aChannel, aContext);
+  if (!remote) {
+    throw new Error('Please select a remote file.');
+  }
+  // the result
+  const result$ = (await venv$)
+    ? updateLocalFromVirtual(aFileName, remote, aLpar, aChannel, aContext)
+    : updateVirtualFromLocal(aFileName, remote, aLpar, aChannel, aContext);
   // some timing
   return timing(aChannel, 'syncLocal', result$);
 }
