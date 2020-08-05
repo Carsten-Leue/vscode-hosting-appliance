@@ -20,34 +20,35 @@
   },
   "dependencies": {
     "byline": "^5.0.0",
-    "cross-spawn": "^7.0.2",
-    "rxjs": "^6.5.5",
+    "cross-spawn": "^7.0.3",
+    "rxjs": "^6.6.2",
     "ssh-config": "^4.0.2",
     "xhr2": "^0.2.0"
   },
   "devDependencies": {
     "@types/byline": "^4.2.32",
-    "@types/chai": "^4.2.11",
+    "@types/chai": "^4.2.12",
     "@types/cross-spawn": "^6.0.2",
-    "@types/glob": "^7.1.1",
-    "@types/mocha": "^7.0.2",
-    "@types/node": "^14.0.4",
-    "@types/vscode": "^1.45.1",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "^2.34.0",
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.1",
+    "@types/node": "^14.0.27",
+    "@types/vscode": "^1.47.0",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
     "chai": "^4.2.0",
-    "eslint": "^7.0.0",
+    "eslint": "^7.6.0",
     "glob": "^7.1.6",
-    "mocha": "^7.1.2",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.3",
-    "vsce": "^1.75.0",
-    "vscode-test": "^1.3.0"
+    "mocha": "^8.1.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
+    "vsce": "^1.77.0",
+    "vscode-test": "^1.4.0"
   },
   "engines": {
-    "vscode": "^1.45.1"
+    "vscode": "^1.47.0"
   },
   "activationEvents": [
+    "onCommand:hosting-appliance.injectablesByType",
     "onCommand:hosting-appliance.findFiles",
     "onCommand:hosting-appliance.copyToLpar",
     "onCommand:hosting-appliance.copyFromLpar",
@@ -63,6 +64,11 @@
   ],
   "contributes": {
     "commands": [
+      {
+        "command": "hosting-appliance.injectablesByType",
+        "category": "HA-DI",
+        "title": "🔍 Injectables By Type"
+      },
       {
         "command": "hosting-appliance.findFiles",
         "category": "HA",

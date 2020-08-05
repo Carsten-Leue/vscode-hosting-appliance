@@ -1,6 +1,7 @@
-import { isAbsolute, parse } from 'path';
-import { reduce } from 'rxjs/operators';
+import { isAbsolute, parse } from "path";
+import { reduce } from "rxjs/operators";
 import {
+  commands,
   ExtensionContext,
   Memento,
   OutputChannel,
@@ -9,13 +10,12 @@ import {
   Uri,
   window,
   workspace,
-  commands,
-} from 'vscode';
+} from "vscode";
 
-import { copyLocalFile, makeDir } from '../utils/copy.file';
-import { findFile } from '../utils/find.file';
-import { getVirtualEnvironmentDir } from './venv.utils';
-import { timing } from '../utils/timer';
+import { copyLocalFile, makeDir } from "../utils/copy.file";
+import { findFile } from "../utils/find.file";
+import { timing } from "../utils/timer";
+import { getVirtualEnvironmentDir } from "./venv.utils";
 
 const SEED = 4;
 
@@ -83,7 +83,7 @@ export function getActiveDocument(): Thenable<Uri> {
     return Promise.resolve(editor.document.uri);
   }
   // fails opening the document
-  return Promise.reject(new Error('No open document.'));
+  return Promise.reject(new Error("No open document."));
 }
 
 export function resetMapping(
@@ -142,7 +142,7 @@ export function getRemoteFile(
     .pipe(reduce((res: string[], item) => [...res, item], []))
     .toPromise();
   // update
-  const selected$ = window.showQuickPick(file$, { placeHolder: 'Remote File' });
+  const selected$ = window.showQuickPick(file$, { placeHolder: "Remote File" });
   // if selected update the memento
   return selected$.then((selectedResult) => {
     // in case there exists a selection, update it
@@ -176,7 +176,7 @@ export function selectRemoteFile(aName: string, aLpar: string) {
   const file$ = findFile(aName, aLpar)
     .pipe(reduce((res: string[], item) => [...res, item], []))
     .toPromise();
-  return window.showQuickPick(file$, { placeHolder: 'Remote File' });
+  return window.showQuickPick(file$, { placeHolder: "Remote File" });
 }
 
 interface QuickPickFile extends QuickPickItem {
@@ -194,11 +194,11 @@ function createQuickPickFile(aUri: Uri): QuickPickFile {
   };
 }
 
-const DIST_PACKAGES = '/dist-packages/';
+const DIST_PACKAGES = "/dist-packages/";
 
 function openPythonSettings() {
   return commands.executeCommand(
-    'workbench.action.openSettings',
+    "workbench.action.openSettings",
     `@ext:ms-python.python`
   );
 }
@@ -219,12 +219,12 @@ async function guessVirtualEnvironmentFiles(
   // suffix
   const suffix = aRemote.substr(idx + DIST_PACKAGES.length);
   // locate the virtual environment root
-  const config = workspace.getConfiguration('python', aScope);
+  const config = workspace.getConfiguration("python", aScope);
   // access
-  const path = config.get<string | undefined>('pythonPath');
+  const path = config.get<string | undefined>("pythonPath");
   if (!path) {
     await openPythonSettings();
-    throw new Error('Python path not configured.');
+    throw new Error("Python path not configured.");
   }
   // get the root directory from the python path
   const pythonUri = isAbsolute(path)
@@ -298,7 +298,7 @@ function getLocalFileName(
     .then((result) => result.map((uri) => createQuickPickFile(uri!)));
   // update
   const selected$ = window.showQuickPick(localFiles$, {
-    placeHolder: 'Local File',
+    placeHolder: "Local File",
   });
   // if selected update the memento
   return selected$.then((selectedResult) => {
@@ -322,7 +322,7 @@ function getLocalFileName(
       return Promise.all([local$, remote$]).then(() => uri);
     }
     // return the value
-    return Promise.reject('Please select a local file.');
+    return Promise.reject("Please select a local file.");
   });
 }
 
@@ -371,7 +371,7 @@ async function updateLocalFromVirtual(
   // show in the status bar
   window.setStatusBarMessage(`Updating local file from ${aVirtual} ...`, copy$);
   // some timing
-  return timing(aChannel, 'updateLocalFromVirtual', copy$);
+  return timing(aChannel, "updateLocalFromVirtual", copy$);
 }
 
 async function updateVirtualFromLocal(
@@ -400,7 +400,7 @@ async function updateVirtualFromLocal(
     copy$
   );
   // some timing
-  return timing(aChannel, 'updateVirtualFromLocal', copy$);
+  return timing(aChannel, "updateVirtualFromLocal", copy$);
 }
 
 /**
@@ -422,12 +422,12 @@ export async function syncLocal(
   // locate the matching remote file
   const remote = await getRemoteFile(aFileName, aLpar, aChannel, aContext);
   if (!remote) {
-    throw new Error('Please select a remote file.');
+    throw new Error("Please select a remote file.");
   }
   // the result
   const result$ = (await venv$)
     ? updateLocalFromVirtual(aFileName, remote, aLpar, aChannel, aContext)
     : updateVirtualFromLocal(aFileName, remote, aLpar, aChannel, aContext);
   // some timing
-  return timing(aChannel, 'syncLocal', result$);
+  return timing(aChannel, "syncLocal", result$);
 }

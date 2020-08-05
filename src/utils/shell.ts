@@ -2,6 +2,7 @@ import * as _byLine from 'byline';
 import { ChildProcess, SpawnOptions } from 'child_process';
 import { spawn } from 'cross-spawn';
 import { Observable, Observer } from 'rxjs';
+import { filter, map, reduce } from 'rxjs/operators';
 
 export enum SPAWN_OUTPUT_TYPE {
   STDOUT,
@@ -86,4 +87,30 @@ export function rxSpawn(
     // handle killing the process
     return () => proc.kill();
   });
+}
+
+/**
+ * Spawns a process with arguments and produces
+ *
+ * @param aCmd - the command to execute
+ * @param aArgs - arguments to the command
+ * @param aOpts - command options
+ *
+ * @returns an observable with the line based output of the command
+ */
+export async function spawnJson(
+  aCmd: string,
+  aArgs: string[],
+  aOpts?: SpawnOptions
+): Promise<any> {
+  // dispatch
+  return rxSpawn(aCmd, aArgs, aOpts)
+    .pipe(
+      filter(([type]) => type === SPAWN_OUTPUT_TYPE.STDOUT),
+      map(([, line]) => line),
+      reduce((dst: string[], line: string) => [...dst, line], []),
+      map((lines) => lines.join('')),
+      map((total) => JSON.parse(total.trim()))
+    )
+    .toPromise();
 }

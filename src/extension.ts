@@ -11,6 +11,7 @@ import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { EXT_NAME } from './constants';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
+import { createInjectablesByTypeCommand } from './commands/injectable.by.type'
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -44,6 +45,7 @@ export function activate(context: ExtensionContext) {
   addCommand('restartServices', createRestartServicesCommand);
   addCommand('getRepositories', createGetRepositoriesCommand);
   addCommand('syncWithVenv', createSyncWithVEnvCommand);
+  addCommand('injectablesByType', createInjectablesByTypeCommand);
 }
 
 // this method is called when your extension is deactivated
