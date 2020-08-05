@@ -31,13 +31,38 @@ function createQuickPickInjectable(
   return { tuple, label, description, detail };
 }
 
-export async function selectInjectable(
+const EMPTY_TUPLE: [string, string, string] = ['', '', ''];
+
+function createRefresh(): QuickPickInjectable {
+  return {
+    tuple: EMPTY_TUPLE,
+    label: '↻ Reload ...',
+    description: 'Reload list of injectables.',
+  };
+}
+
+let CACHED_INJECTABLES: Promise<QuickPickInjectable[]> | undefined;
+let PYTHON_DIR: string | undefined;
+
+function getInjectables(aPython: string): Promise<QuickPickInjectable[]> {
+  // return a cached copy if possible
+  if (aPython === PYTHON_DIR && CACHED_INJECTABLES) {
+    return CACHED_INJECTABLES;
+  }
+  // create a new copy
+  PYTHON_DIR = aPython;
+  CACHED_INJECTABLES = findInjectables(aPython)
+    .then((items) => items.map(createQuickPickInjectable))
+    .then((items) => [createRefresh(), ...items]);
+  // returns the list
+  return CACHED_INJECTABLES;
+}
+
+async function _selectInjectable(
   aPython: string
 ): Promise<[string, string, string]> {
   // injectables
-  const inj$ = findInjectables(aPython).then((items) =>
-    items.map(createQuickPickInjectable)
-  );
+  const inj$ = getInjectables(aPython);
   // update
   const selected = await window.showQuickPick(inj$, {
     placeHolder: 'Injectables',
@@ -45,9 +70,23 @@ export async function selectInjectable(
     matchOnDetail: true,
     canPickMany: false,
   });
-  // extract
+  // extract the items
   if (!selected) {
     throw new Error('No item selected');
   }
+  // extracted tuple
   return selected.tuple;
+}
+
+export async function selectInjectable(
+  aPython: string
+): Promise<[string, string, string]> {
+  // extracted tuple
+  let tuple = await _selectInjectable(aPython);
+  while (tuple === EMPTY_TUPLE) {
+    CACHED_INJECTABLES = undefined;
+    tuple = await _selectInjectable(aPython);
+  }
+  // return the tuple
+  return tuple;
 }
