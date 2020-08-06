@@ -1,14 +1,9 @@
-import {
-  window,
-  ExtensionContext,
-  OutputChannel,
-  Uri,
-  workspace,
-  SnippetString,
-} from 'vscode';
-import { getActiveDocument } from './copy.utils';
-import { getPythonExecutable } from '../utils/python.utils';
+import { ExtensionContext, OutputChannel, SnippetString, Uri, window, workspace } from 'vscode';
+
+import { Injectable } from '../utils/analysis';
 import { selectInjectable } from '../utils/injectables';
+import { getPythonExecutable } from '../utils/python.utils';
+import { getActiveDocument } from './copy.utils';
 
 export const createInjectablesByTypeCommand = (
   channel: OutputChannel,
@@ -28,14 +23,12 @@ export const createInjectablesByTypeCommand = (
   const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
   channel.appendLine(`Python Executable [${pythonExec}]`);
 
-  const selected = await selectInjectable(pythonExec.fsPath);
+  const selected: Injectable = await selectInjectable(pythonExec.fsPath);
   channel.appendLine(`Selected Injectable [${selected}]`);
 
   const editor = window.activeTextEditor;
   if (editor) {
-    const [name, module] = selected;
-    await editor.insertSnippet(
-      new SnippetString(`from ${module} import ${name}`)
-    );
+    const { name, pkg } = selected;
+    await editor.insertSnippet(new SnippetString(`from ${pkg} import ${name}`));
   }
 };

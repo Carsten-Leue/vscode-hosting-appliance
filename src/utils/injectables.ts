@@ -1,68 +1,57 @@
-import { join } from 'path';
-import { spawnJson } from './shell';
-import { window, QuickPickItem } from 'vscode';
-import { ASSET_ROOT } from './assets';
+import { QuickPickItem, window } from 'vscode';
+
+import { findAnalysis, Injectable } from './analysis';
 
 /**
  * Locates a list of injectables
  *
  * @param aPython - name of the python exectuable
- * @param aLpar - identifier of the LPAR, we assume that `ssh LPAR` works
+ * @param aUpdate - identifier to check if we want to update
  *
  * @returns an observable of the lines
  */
 export async function findInjectables(
-  aPython: string
-): Promise<[[string, string, string]]> {
+  aPython: string,
+  aUpdate: boolean
+): Promise<Injectable[]> {
   // local script
-  const script = join(ASSET_ROOT, 'python', 'injectables.py');
-  // dispatch
-  return spawnJson(aPython, [script]);
+  const analysis = await findAnalysis(aPython, aUpdate);
+  return analysis.injectables;
 }
 
 interface QuickPickInjectable extends QuickPickItem {
-  tuple: [string, string, string];
+  injectable: Injectable;
 }
 
 function createQuickPickInjectable(
-  tuple: [string, string, string]
+  injectable: Injectable
 ): QuickPickInjectable {
-  const [label, description, detail] = tuple;
-  return { tuple, label, description, detail };
+  const { name, pkg, type } = injectable;
+  return { injectable, label: name, description: pkg, detail: type };
 }
 
-const EMPTY_TUPLE: [string, string, string] = ['', '', ''];
+const EMPTY_INJECTABLE: Injectable = {
+  name: '↻ Reload ...',
+  pkg: '',
+  type: 'Reload list of injectables.',
+};
 
-function createRefresh(): QuickPickInjectable {
-  return {
-    tuple: EMPTY_TUPLE,
-    label: '↻ Reload ...',
-    description: 'Reload list of injectables.',
-  };
-}
-
-let CACHED_INJECTABLES: Promise<QuickPickInjectable[]> | undefined;
-let PYTHON_DIR: string | undefined;
-
-function getInjectables(aPython: string): Promise<QuickPickInjectable[]> {
-  // return a cached copy if possible
-  if (aPython === PYTHON_DIR && CACHED_INJECTABLES) {
-    return CACHED_INJECTABLES;
-  }
+function getInjectables(
+  aPython: string,
+  aUpdate: boolean
+): Promise<QuickPickInjectable[]> {
   // create a new copy
-  PYTHON_DIR = aPython;
-  CACHED_INJECTABLES = findInjectables(aPython)
+  return findInjectables(aPython, aUpdate)
     .then((items) => items.map(createQuickPickInjectable))
-    .then((items) => [createRefresh(), ...items]);
-  // returns the list
-  return CACHED_INJECTABLES;
+    .then((items) => [createQuickPickInjectable(EMPTY_INJECTABLE), ...items]);
 }
 
 async function _selectInjectable(
-  aPython: string
-): Promise<[string, string, string]> {
+  aPython: string,
+  aUpdate: boolean
+): Promise<Injectable> {
   // injectables
-  const inj$ = getInjectables(aPython);
+  const inj$ = getInjectables(aPython, aUpdate);
   // update
   const selected = await window.showQuickPick(inj$, {
     placeHolder: 'Injectables',
@@ -75,18 +64,15 @@ async function _selectInjectable(
     throw new Error('No item selected');
   }
   // extracted tuple
-  return selected.tuple;
+  return selected.injectable;
 }
 
-export async function selectInjectable(
-  aPython: string
-): Promise<[string, string, string]> {
+export async function selectInjectable(aPython: string): Promise<Injectable> {
   // extracted tuple
-  let tuple = await _selectInjectable(aPython);
-  while (tuple === EMPTY_TUPLE) {
-    CACHED_INJECTABLES = undefined;
-    tuple = await _selectInjectable(aPython);
+  let inj = await _selectInjectable(aPython, false);
+  while (inj === EMPTY_INJECTABLE) {
+    inj = await _selectInjectable(aPython, true);
   }
   // return the tuple
-  return tuple;
+  return inj;
 }
