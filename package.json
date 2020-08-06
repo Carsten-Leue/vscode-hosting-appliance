@@ -48,6 +48,7 @@
     "vscode": "^1.47.0"
   },
   "activationEvents": [
+    "onCommand:hosting-appliance.providers",
     "onCommand:hosting-appliance.injectablesByType",
     "onCommand:hosting-appliance.findFiles",
     "onCommand:hosting-appliance.copyToLpar",
@@ -68,6 +69,11 @@
         "command": "hosting-appliance.injectablesByType",
         "category": "HA-DI",
         "title": "🔍 Injectables By Type"
+      },
+      {
+        "command": "hosting-appliance.providers",
+        "category": "HA-DI",
+        "title": "🔍 Providers"
       },
       {
         "command": "hosting-appliance.findFiles",

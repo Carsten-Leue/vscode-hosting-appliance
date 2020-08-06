@@ -5,13 +5,14 @@ import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createFindFilesCommand } from './commands/find.file';
 import { createGetRepositoriesCommand } from './commands/get.repositories';
+import { createInjectablesByTypeCommand } from './commands/injectable.by.type';
+import { createProvidersCommand } from './commands/providers';
 import { createResetMappingCommand } from './commands/reset.mapping';
 import { createRestartServicesCommand } from './commands/restart.services';
 import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
-import { EXT_NAME } from './constants';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
-import { createInjectablesByTypeCommand } from './commands/injectable.by.type'
+import { EXT_NAME } from './constants';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -46,6 +47,7 @@ export function activate(context: ExtensionContext) {
   addCommand('getRepositories', createGetRepositoriesCommand);
   addCommand('syncWithVenv', createSyncWithVEnvCommand);
   addCommand('injectablesByType', createInjectablesByTypeCommand);
+  addCommand('providers', createProvidersCommand);
 }
 
 // this method is called when your extension is deactivated
