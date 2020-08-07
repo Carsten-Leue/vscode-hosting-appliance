@@ -48,8 +48,11 @@ interface QuickPickInjectable extends QuickPickItem {
 }
 
 function createQuickPickInjectable(provider: Provider): QuickPickInjectable {
-  const { name, pkg } = provider;
-  return { provider, label: name, description: pkg };
+  const { name, pkg, exports } = provider;
+  const detail = Array.isArray(exports)
+    ? exports.map(({ name }) => name).join(', ')
+    : exports.name;
+  return { provider, label: name, description: pkg, detail };
 }
 
 const EMPTY_PROVIDER: Module = {
@@ -81,7 +84,7 @@ async function _selectProvider(
   const selected = await window.showQuickPick(inj$, {
     placeHolder: 'Providers',
     matchOnDescription: true,
-    matchOnDetail: true,
+    matchOnDetail: false,
     canPickMany: false,
   });
   // extract the items

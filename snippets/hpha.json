@@ -1,0 +1,18 @@
+{
+  "Copyright": {
+    "prefix": "copyright",
+    "body": [
+      "# +-------------------------------------------------------------------+",
+      "# | Licensed Materials - Property of IBM                              |",
+      "# |                                                                   |",
+      "# | Hosting Appliance                                                 |",
+      "# |                                                                   |",
+      "# | Copyright IBM Corp. $CURRENT_YEAR All Rights Reserved                      |",
+      "# |                                                                   |",
+      "# | US Government Users Restricted Rights - Use, duplication or       |",
+      "# | disclosure restricted by GSA ADP Schedule Contract with IBM Corp. |",
+      "# +-------------------------------------------------------------------+"
+    ],
+    "description": "Copyright statement for Hyper Protect Hosting Appliance"
+  }
+}

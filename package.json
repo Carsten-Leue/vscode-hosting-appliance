@@ -2,6 +2,12 @@
   "name": "hosting-appliance",
   "version": "0.0.22",
   "description": "Code development for hosting appliance",
+  "keywords": [
+    "Hyper Protect",
+    "Hyper Protect Hosting Appliance",
+    "IBM",
+    "Python"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Carsten-Leue/vscode-hosting-appliance"
@@ -61,9 +67,17 @@
     "onCommand:hosting-appliance.syncWithVenv"
   ],
   "categories": [
-    "Other"
+    "Other",
+    "Snippets",
+    "Extension Packs"
   ],
   "contributes": {
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./snippets/hpha.json"
+      }
+    ],
     "commands": [
       {
         "command": "hosting-appliance.injectables",
