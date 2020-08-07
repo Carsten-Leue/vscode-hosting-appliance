@@ -68,7 +68,7 @@
       {
         "command": "hosting-appliance.injectables",
         "category": "HA-DI",
-        "title": "🔍 Injectables By Type"
+        "title": "🔍 Injectables"
       },
       {
         "command": "hosting-appliance.providers",
