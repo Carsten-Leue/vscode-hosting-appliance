@@ -49,7 +49,7 @@
   },
   "activationEvents": [
     "onCommand:hosting-appliance.providers",
-    "onCommand:hosting-appliance.injectablesByType",
+    "onCommand:hosting-appliance.injectables",
     "onCommand:hosting-appliance.findFiles",
     "onCommand:hosting-appliance.copyToLpar",
     "onCommand:hosting-appliance.copyFromLpar",
@@ -66,7 +66,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "hosting-appliance.injectablesByType",
+        "command": "hosting-appliance.injectables",
         "category": "HA-DI",
         "title": "🔍 Injectables By Type"
       },
@@ -141,11 +141,11 @@
   },
   "displayName": "hosting-appliance",
   "extensionPack": [
-    "ms-python.python",
-    "njpwerner.autodocstring",
-    "coenraads.bracket-pair-colorizer-2",
+    "brainfit.vscode-importmagic",
     "eamodio.gitlens",
     "ms-pyright.pyright",
+    "ms-python.python",
+    "njpwerner.autodocstring",
     "visualstudioexptteam.vscodeintellicode"
   ],
   "icon": "images/icon.png",

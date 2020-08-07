@@ -1,11 +1,12 @@
-import { ExtensionContext, OutputChannel, SnippetString, Uri, window, workspace } from 'vscode';
+import { ExtensionContext, OutputChannel, Uri, workspace } from 'vscode';
 
 import { Injectable } from '../utils/analysis';
 import { selectInjectable } from '../utils/injectables';
+import { insertImport } from '../utils/insert.import';
 import { getPythonExecutable } from '../utils/python.utils';
 import { getActiveDocument } from './copy.utils';
 
-export const createInjectablesByTypeCommand = (
+export const createInjectablesCommand = (
   channel: OutputChannel,
   context: ExtensionContext
 ) => async () => {
@@ -26,9 +27,6 @@ export const createInjectablesByTypeCommand = (
   const selected: Injectable = await selectInjectable(pythonExec.fsPath);
   channel.appendLine(`Selected Injectable [${selected}]`);
 
-  const editor = window.activeTextEditor;
-  if (editor) {
-    const { name, pkg } = selected;
-    await editor.insertSnippet(new SnippetString(`from ${pkg} import ${name}`));
-  }
+  // update
+  await insertImport(selected.pkg, selected.name);
 };

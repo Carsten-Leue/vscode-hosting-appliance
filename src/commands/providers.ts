@@ -1,5 +1,6 @@
-import { ExtensionContext, OutputChannel, SnippetString, Uri, window, workspace } from 'vscode';
+import { ExtensionContext, OutputChannel, Uri, workspace } from 'vscode';
 
+import { insertImport } from '../utils/insert.import';
 import { Provider, selectProvider } from '../utils/providers';
 import { getPythonExecutable } from '../utils/python.utils';
 import { getActiveDocument } from './copy.utils';
@@ -25,9 +26,6 @@ export const createProvidersCommand = (
   const selected: Provider = await selectProvider(pythonExec.fsPath);
   channel.appendLine(`Selected Provider [${selected}]`);
 
-  const editor = window.activeTextEditor;
-  if (editor) {
-    const { name, pkg } = selected;
-    await editor.insertSnippet(new SnippetString(`from ${pkg} import ${name}`));
-  }
+  // update
+  await insertImport(selected.pkg, selected.name);
 };

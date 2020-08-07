@@ -5,7 +5,7 @@ import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createFindFilesCommand } from './commands/find.file';
 import { createGetRepositoriesCommand } from './commands/get.repositories';
-import { createInjectablesByTypeCommand } from './commands/injectable.by.type';
+import { createInjectablesCommand } from './commands/injectables';
 import { createProvidersCommand } from './commands/providers';
 import { createResetMappingCommand } from './commands/reset.mapping';
 import { createRestartServicesCommand } from './commands/restart.services';
@@ -46,7 +46,7 @@ export function activate(context: ExtensionContext) {
   addCommand('restartServices', createRestartServicesCommand);
   addCommand('getRepositories', createGetRepositoriesCommand);
   addCommand('syncWithVenv', createSyncWithVEnvCommand);
-  addCommand('injectablesByType', createInjectablesByTypeCommand);
+  addCommand('injectables', createInjectablesCommand);
   addCommand('providers', createProvidersCommand);
 }
 
