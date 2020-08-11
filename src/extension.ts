@@ -13,6 +13,7 @@ import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
 import { EXT_NAME } from './constants';
+import { createPackageCommand } from './commands/create.package';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -48,6 +49,7 @@ export function activate(context: ExtensionContext) {
   addCommand('syncWithVenv', createSyncWithVEnvCommand);
   addCommand('injectables', createInjectablesCommand);
   addCommand('providers', createProvidersCommand);
+  addCommand('package', createPackageCommand);
 }
 
 // this method is called when your extension is deactivated
