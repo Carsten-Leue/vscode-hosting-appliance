@@ -1,6 +1,15 @@
 import { mkdir, PathLike, readdir, readFile, stat, Stats, writeFile } from 'fs';
-import { join, normalize, parse } from 'path';
-import { bindNodeCallback, EMPTY, from, merge, MonoTypeOperatorFunction, Observable, of, UnaryFunction } from 'rxjs';
+import { join, normalize, parse, relative } from 'path';
+import {
+  bindNodeCallback,
+  EMPTY,
+  from,
+  merge,
+  MonoTypeOperatorFunction,
+  Observable,
+  of,
+  UnaryFunction,
+} from 'rxjs';
 import { catchError, map, mapTo, mergeMap } from 'rxjs/operators';
 
 const rxStat = bindNodeCallback<PathLike, Stats>(stat);
@@ -244,4 +253,15 @@ export function writeFiles<T>(
     ensureWriteFile(aRoot, aDesc, mkdirs, aOverride);
 
   return mergeMap(write);
+}
+
+export function relativePath(aSrc: string, aDst: string): string {
+  return relative(aSrc, aDst).replace(/\\/g, '/');
+}
+
+export function createReader(
+  aBaseDir: string
+): UnaryFunction<string, Observable<FileDescriptor<Buffer>>> {
+  return (path: string) =>
+    rxReadBinFile(aBaseDir, { path, isDirectory: false });
 }

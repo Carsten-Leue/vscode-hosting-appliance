@@ -48,8 +48,8 @@ export const createPackageCommand = (
       // construct the new files
       const written$ = rootDir$.pipe(
         mergeMap((rootDir) =>
-          generatePackage(rootDir, packageName).pipe(
-            writeFiles(dstFolder),
+          generatePackage(rootDir, dstFolder, packageName).pipe(
+            writeFiles(rootDir),
             createFileLogger(channel)
           )
         )
