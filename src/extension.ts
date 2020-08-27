@@ -3,6 +3,7 @@
 import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
+import { createPackageCommand } from './commands/create.package';
 import { createFindFilesCommand } from './commands/find.file';
 import { createGetRepositoriesCommand } from './commands/get.repositories';
 import { createInjectablesCommand } from './commands/injectables';
@@ -13,7 +14,6 @@ import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
 import { EXT_NAME } from './constants';
-import { createPackageCommand } from './commands/create.package';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -31,12 +31,15 @@ export function activate(context: ExtensionContext) {
       aContext: ExtensionContext
     ) => (...args: any[]) => any
   ) {
+    // register the command
     context.subscriptions.push(
       commands.registerCommand(
         `${EXT_NAME}.${aName}`,
         aCreator(channel, context)
       )
     );
+    // log this
+    channel.appendLine(`Registering command [${EXT_NAME}.${aName}] ...`);
   }
 
   addCommand('findFiles', createFindFilesCommand);
