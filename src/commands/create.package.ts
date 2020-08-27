@@ -1,11 +1,19 @@
 import { parse } from 'path';
 import { mergeMap, shareReplay } from 'rxjs/operators';
-import { ExtensionContext, OutputChannel, Uri, window } from 'vscode';
+import {
+  ExtensionContext,
+  OutputChannel,
+  Uri,
+  window,
+  workspace,
+} from 'vscode';
 
 import { createFileLogger } from '../utils/channels';
 import { writeFiles } from '../utils/file';
 import { generatePackage } from '../utils/generate.package';
+import { getPythonExecutable } from '../utils/python.utils';
 import { findRootDir } from '../utils/root.dir';
+import { getActiveDocument } from './copy.utils';
 
 function getParentFolder(): Uri | undefined {
   // the current editor
@@ -25,6 +33,19 @@ export const createPackageCommand = (
   channel: OutputChannel,
   context: ExtensionContext
 ) => async () => {
+  // current document
+  const activeDocUri: Uri = await getActiveDocument();
+
+  const wsFolder = workspace.getWorkspaceFolder(activeDocUri);
+  if (!wsFolder) {
+    return Promise.reject(
+      `Unable to get the workspace folder for ${activeDocUri}`
+    );
+  }
+
+  // locate python executable
+  const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
+  channel.appendLine(`Python Executable [${pythonExec}]`);
   // current document
   const defaultUri = getParentFolder();
   // pick the target folder
@@ -48,10 +69,12 @@ export const createPackageCommand = (
       // construct the new files
       const written$ = rootDir$.pipe(
         mergeMap((rootDir) =>
-          generatePackage(rootDir, dstFolder, packageName).pipe(
-            writeFiles(rootDir),
-            createFileLogger(channel)
-          )
+          generatePackage(
+            pythonExec.fsPath,
+            rootDir,
+            dstFolder,
+            packageName
+          ).pipe(writeFiles(rootDir), createFileLogger(channel))
         )
       );
       // done

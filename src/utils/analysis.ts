@@ -144,7 +144,7 @@ export function analyze(): OperatorFunction<string, Analysis> {
  *
  * @returns the analysis
  */
-async function internalfindAnalysis(aPython: string): Promise<Analysis> {
+async function internalFindAnalysis(aPython: string): Promise<Analysis> {
   // local script
   const script = join(ASSET_ROOT, 'python', 'injectables.py');
   // dispatch
@@ -177,7 +177,7 @@ export async function findAnalysis(
     return cached;
   }
   // update
-  const updated = internalfindAnalysis(aPython);
+  const updated = internalFindAnalysis(aPython);
   INTERNAL_CACHE[aPython] = updated;
   // ok
   return updated;

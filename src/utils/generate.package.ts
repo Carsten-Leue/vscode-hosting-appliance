@@ -1,10 +1,22 @@
 import { join, parse } from 'path';
 import { merge, Observable } from 'rxjs';
-import { filter, map, mergeMap, reduce, shareReplay } from 'rxjs/operators';
+import {
+  filter,
+  map,
+  mergeMap,
+  pluck,
+  reduce,
+  shareReplay,
+} from 'rxjs/operators';
 
 import { ASSET_ROOT } from './assets';
 import { parseConfig, serializeConfig } from './config.parser';
-import { createFileDescriptor, createReader, FileDescriptor, relativePath } from './file';
+import {
+  createFileDescriptor,
+  createReader,
+  FileDescriptor,
+  relativePath,
+} from './file';
 import { rxApplyTemplates, rxReadTemplates } from './templates';
 
 const TEMPLATE_ROOT = join(ASSET_ROOT, 'templates', 'package');
@@ -15,13 +27,14 @@ function isInitFile(aFileName: string): boolean {
 }
 
 function assertSection(aConfig: any, aSection: string): any {
-  if (!aConfig.hasSection(aSection)) {
-    aConfig.addSection(aSection);
+  if (!aConfig[aSection]) {
+    aConfig[aSection] = {};
   }
   return aConfig;
 }
 
 export function generatePackage(
+  aPython: string,
   aRootDir: string,
   aDstDir: string,
   aPackageName: string
@@ -29,10 +42,13 @@ export function generatePackage(
   // read callback
   const reader = createReader(aRootDir);
   // config
-  const config$ = reader('.bumpversion.cfg').pipe(mergeMap(parseConfig));
+  const config$ = reader('.bumpversion.cfg').pipe(
+    mergeMap((data) => parseConfig(aPython, data))
+  );
   // version
   const version$ = config$.pipe(
-    map(([, cfg]) => cfg.get('bumpversion', 'current_version')),
+    map(([, cfg]) => cfg),
+    pluck('bumpversion', 'current_version'),
     shareReplay()
   );
   // prepare the data record
@@ -63,7 +79,7 @@ export function generatePackage(
         map((cfg) => createFileDescriptor(path, cfg))
       )
     ),
-    mergeMap(serializeConfig)
+    mergeMap((cfg) => serializeConfig(aPython, cfg))
   );
 
   // write the files

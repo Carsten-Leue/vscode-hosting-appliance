@@ -1,6 +1,6 @@
 {
-  "Copyright": {
-    "prefix": "copyright",
+  "HPHACopyright": {
+    "prefix": "ha-copyright",
     "body": [
       "# +-------------------------------------------------------------------+",
       "# | Licensed Materials - Property of IBM                              |",
@@ -14,5 +14,26 @@
       "# +-------------------------------------------------------------------+"
     ],
     "description": "Copyright statement for Hyper Protect Hosting Appliance"
+  },
+  "HPHAInjectable": {
+    "prefix": "di-injectable",
+    "body": [
+      "${1:INJ_}: Injectable[${2:type}] = create_injectable('$1', $2)",
+      "\"\"\"Injection token for $2\"\"\""
+    ],
+    "description": "Create a new Injectable for Hyper Protect Hosting Appliance"
+  },
+  "HPHAProvider": {
+    "prefix": "di-provider",
+    "body": [
+      "${1:PROVIDER_}: ProviderDefinition[${2:type}] = create_provider_definition(${3:INJ_}, ${4:factory} $0)",
+      "\"\"\"Provider definition for $2\"\"\""
+    ],
+    "description": "Create a Provider Definition for Hyper Protect Hosting Appliance"
+  },
+  "HPHAModule": {
+    "prefix": "di-module",
+    "body": ["${1:MODULE_}: Module = create_module($0)", "\"\"\"Module\"\"\""],
+    "description": "Bundles multiple Provider Definitions for Hyper Protect Hosting Appliance"
   }
 }
