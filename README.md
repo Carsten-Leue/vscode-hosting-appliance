@@ -5,7 +5,7 @@ Development tooling for the hosting appliance. The extension allows to easily co
 ## System Setup
 
 * Make sure to setup ssh access to your LPAR and enable passwordless authentication
-* Have `ssh` and `scp` available on the claspath
+* Have `ssh` and `scp` available on the classpath
 
 ## Usage
 
