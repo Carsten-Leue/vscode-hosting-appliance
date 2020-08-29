@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 
+import { createCopyFromLparCommand } from './commands/copy.from.lpar';
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createPackageCommand } from './commands/create.package';
 import { createFindFilesCommand } from './commands/find.file';
@@ -44,6 +45,7 @@ export function activate(context: ExtensionContext) {
 
   addCommand('findFiles', createFindFilesCommand);
   addCommand('copyToLpar', createCopyToLparCommand);
+  addCommand('copyFromLpar', createCopyFromLparCommand);
   addCommand('showConfig', createShowConfigCommand);
   addCommand('resetMapping', createResetMappingCommand);
   addCommand('runUnitTest', createRunUnitTestCommand);
