@@ -165,7 +165,7 @@
   "extensionPack": [
     "brainfit.vscode-importmagic",
     "eamodio.gitlens",
-    "ms-pyright.pyright",
+    "ms-python.vscode-pylance",
     "ms-python.python",
     "njpwerner.autodocstring",
     "visualstudioexptteam.vscodeintellicode"
