@@ -13,7 +13,7 @@ import { rxSpawn, SPAWN_OUTPUT_TYPE } from './shell';
  */
 export function findFile(aName: string, aLpar: string): Observable<string> {
   // build the command
-  const finder = `find /usr/lib /usr/local/lib /var/www/api /usr/local/zACI/test -name "${aName}"`;
+  const finder = `find /usr/lib /usr/local/lib /var/www/api /usr/local/zACI/test/unittests -name "${aName}"`;
   // dispatch
   return rxSpawn('ssh', [aLpar, finder]).pipe(
     filter(([type]) => type === SPAWN_OUTPUT_TYPE.STDOUT),
