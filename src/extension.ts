@@ -1,7 +1,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
-
+import {
+  commands,
+  ExtensionContext,
+  OutputChannel,
+  tasks,
+  window
+} from 'vscode';
 import { createCopyFromLparCommand } from './commands/copy.from.lpar';
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createPackageCommand } from './commands/create.package';
@@ -15,6 +20,7 @@ import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
 import { EXT_NAME } from './constants';
+import { getTaskProvider } from './tasks/task.provider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -43,6 +49,7 @@ export function activate(context: ExtensionContext) {
     channel.appendLine(`Registering command [${EXT_NAME}.${aName}] ...`);
   }
 
+  // commands
   addCommand('findFiles', createFindFilesCommand);
   addCommand('copyToLpar', createCopyToLparCommand);
   addCommand('copyFromLpar', createCopyFromLparCommand);
@@ -55,6 +62,10 @@ export function activate(context: ExtensionContext) {
   addCommand('injectables', createInjectablesCommand);
   addCommand('providers', createProvidersCommand);
   addCommand('package', createPackageCommand);
+
+  context.subscriptions.push(
+    tasks.registerTaskProvider(EXT_NAME, getTaskProvider(channel))
+  );
 }
 
 // this method is called when your extension is deactivated
