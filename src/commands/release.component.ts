@@ -6,7 +6,7 @@ import {
   ProgressLocation,
   Uri,
   window,
-  workspace,
+  workspace
 } from 'vscode';
 import { createLogger, createProgress } from '../utils/logger';
 import { getPythonExecutable } from '../utils/python.utils';
