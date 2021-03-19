@@ -56,8 +56,20 @@
     "vscode": "^1.47.0"
   },
   "activationEvents": [
-    "onStartupFinished",
-    "onLanguage:python"
+    "onCommand:hosting-appliance.package",
+    "onCommand:hosting-appliance.providers",
+    "onCommand:hosting-appliance.injectables",
+    "onCommand:hosting-appliance.findFiles",
+    "onCommand:hosting-appliance.copyToLpar",
+    "onCommand:hosting-appliance.copyFromLpar",
+    "onCommand:hosting-appliance.resetMapping",
+    "onCommand:hosting-appliance.runUnitTest",
+    "onCommand:hosting-appliance.showConfig",
+    "onCommand:hosting-appliance.restartServices",
+    "onCommand:hosting-appliance.getRepositories",
+    "onCommand:hosting-appliance.syncWithVenv",
+    "onCommand:hosting-appliance.updateVenv",
+    "onCommand:hosting-appliance.releaseComponent"
   ],
   "categories": [
     "Other",
@@ -69,14 +81,6 @@
       {
         "language": "python",
         "path": "./snippets/hpha.json"
-      }
-    ],
-    "taskDefinitions": [
-      {
-        "type": "hosting-appliance",
-        "required": [
-          "shell"
-        ]
       }
     ],
     "commands": [
@@ -139,6 +143,16 @@
         "command": "hosting-appliance.syncWithVenv",
         "category": "HA",
         "title": "📄 Sync with Virtual Environment"
+      },
+      {
+        "command": "hosting-appliance.updateVenv",
+        "category": "HA",
+        "title": "↻ Update Virtual Environment"
+      },
+      {
+        "command": "hosting-appliance.releaseComponent",
+        "category": "HA",
+        "title": "🚀 Release Component"
       }
     ],
     "configuration": {

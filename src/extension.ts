@@ -1,12 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import {
-  commands,
-  ExtensionContext,
-  OutputChannel,
-  tasks,
-  window
-} from 'vscode';
+import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 import { createCopyFromLparCommand } from './commands/copy.from.lpar';
 import { createCopyToLparCommand } from './commands/copy.to.lpar';
 import { createPackageCommand } from './commands/create.package';
@@ -14,13 +8,14 @@ import { createFindFilesCommand } from './commands/find.file';
 import { createGetRepositoriesCommand } from './commands/get.repositories';
 import { createInjectablesCommand } from './commands/injectables';
 import { createProvidersCommand } from './commands/providers';
+import { createReleaseComponentCommand } from './commands/release.component';
 import { createResetMappingCommand } from './commands/reset.mapping';
 import { createRestartServicesCommand } from './commands/restart.services';
 import { createRunUnitTestCommand } from './commands/run.unit.test';
 import { createShowConfigCommand } from './commands/show.config';
 import { createSyncWithVEnvCommand } from './commands/sync.with.venv';
+import { createUpdateVEnvCommand } from './commands/update.venv';
 import { EXT_NAME } from './constants';
-import { getTaskProvider } from './tasks/task.provider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -59,13 +54,11 @@ export function activate(context: ExtensionContext) {
   addCommand('restartServices', createRestartServicesCommand);
   addCommand('getRepositories', createGetRepositoriesCommand);
   addCommand('syncWithVenv', createSyncWithVEnvCommand);
+  addCommand('updateVenv', createUpdateVEnvCommand);
   addCommand('injectables', createInjectablesCommand);
   addCommand('providers', createProvidersCommand);
   addCommand('package', createPackageCommand);
-
-  context.subscriptions.push(
-    tasks.registerTaskProvider(EXT_NAME, getTaskProvider(channel))
-  );
+  addCommand('releaseComponent', createReleaseComponentCommand)
 }
 
 // this method is called when your extension is deactivated
