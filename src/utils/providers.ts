@@ -8,7 +8,9 @@ export declare type Provider = Definition | Module;
 function isEqual(aLeft: Injectable, aRight: Injectable): boolean {
   return (
     aLeft === aRight ||
-    (aLeft.name === aRight.name &&
+    (aLeft &&
+      aRight &&
+      aLeft.name === aRight.name &&
       aLeft.pkg === aRight.pkg &&
       aLeft.type === aRight.type)
   );
