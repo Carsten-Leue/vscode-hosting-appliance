@@ -8,10 +8,10 @@ import {
   ProgressLocation,
   Uri,
   window,
-  workspace,
+  workspace
 } from 'vscode';
 import { createLogger, createProgress } from '../utils/logger';
-import { getPythonExecutable } from '../utils/python.utils';
+import { getPythonExecutableV2 } from '../utils/python.utils';
 import { rxSpawn, SpawnLine } from '../utils/shell';
 import { getActiveDocument } from './copy.utils';
 
@@ -38,6 +38,7 @@ function internalUpdateVirtualEnvironment(
   // build the data
   const requirements = join(aRootFolder, 'requirements.txt');
   const testRequirements = join(aRootFolder, 'test-requirements.txt');
+  const constraints = join(aRootFolder, 'constraints.txt');
 
   const requirements$ = hasFile(requirements).pipe(
     map((flag) => (flag ? ['-r', requirements] : []))
@@ -45,15 +46,23 @@ function internalUpdateVirtualEnvironment(
   const testRequirements$ = hasFile(testRequirements).pipe(
     map((flag) => (flag ? ['-r', testRequirements] : []))
   );
+  const constraints$ = hasFile(constraints).pipe(
+    map((flag) => (flag ? ['-c', constraints] : []))
+  );
 
-  const arguments$ = combineLatest([requirements$, testRequirements$]).pipe(
-    map(([req, testReq]) => [
+  const arguments$ = combineLatest([
+    requirements$,
+    testRequirements$,
+    constraints$,
+  ]).pipe(
+    map(([req, testReq, constraints]) => [
       '-m',
       'pip',
       'install',
       'pip',
       ...req,
       ...testReq,
+      ...constraints,
       '--upgrade',
     ])
   );
@@ -62,43 +71,41 @@ function internalUpdateVirtualEnvironment(
   return arguments$.pipe(mergeMap((args) => rxSpawn(aPython, args)));
 }
 
-export const createUpdateVEnvCommand = (
-  aChannel: OutputChannel,
-  aContext: ExtensionContext
-) => async () => {
-  // current document
-  const activeDocUri: Uri = await getActiveDocument();
+export const createUpdateVEnvCommand =
+  (aChannel: OutputChannel, aContext: ExtensionContext) => async () => {
+    // current document
+    const activeDocUri: Uri = await getActiveDocument();
 
-  const wsFolder = workspace.getWorkspaceFolder(activeDocUri);
-  if (!wsFolder) {
-    return Promise.reject(
-      `Unable to get the workspace folder for ${activeDocUri}`
+    const wsFolder = workspace.getWorkspaceFolder(activeDocUri);
+    if (!wsFolder) {
+      return Promise.reject(
+        `Unable to get the workspace folder for ${activeDocUri}`
+      );
+    }
+
+    // locate python executable
+    const pythonExec: Uri = await getPythonExecutableV2(wsFolder.uri);
+    aChannel.appendLine(`Python Executable [${pythonExec}]`);
+
+    // show a message
+    window.showInformationMessage(
+      `Updating virtual environment [${pythonExec.fsPath}] ...`
     );
-  }
 
-  // locate python executable
-  const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
-  aChannel.appendLine(`Python Executable [${pythonExec}]`);
+    await window.withProgress(
+      {
+        location: ProgressLocation.Window,
+      },
+      (progress) =>
+        internalUpdateVirtualEnvironment(pythonExec.fsPath, wsFolder.uri.fsPath)
+          .pipe(
+            createLogger(aChannel, true),
+            createProgress(progress, false, false),
+            ignoreElements()
+          )
+          .toPromise()
+    );
 
-  // show a message
-  window.showInformationMessage(
-    `Updating virtual environment [${pythonExec.fsPath}] ...`
-  );
-
-  await window.withProgress(
-    {
-      location: ProgressLocation.Window,
-    },
-    (progress) =>
-      internalUpdateVirtualEnvironment(pythonExec.fsPath, wsFolder.uri.fsPath)
-        .pipe(
-          createLogger(aChannel, true),
-          createProgress(progress, false, false),
-          ignoreElements()
-        )
-        .toPromise()
-  );
-
-  // show a message
-  window.showInformationMessage(`Updating virtual environment done.`);
-};
+    // show a message
+    window.showInformationMessage(`Updating virtual environment done.`);
+  };

@@ -9,7 +9,7 @@ import {
   workspace
 } from 'vscode';
 import { createLogger, createProgress } from '../utils/logger';
-import { getPythonExecutable } from '../utils/python.utils';
+import { getPythonExecutableV2 } from '../utils/python.utils';
 import { rxSpawn, SpawnLine, SPAWN_OUTPUT_TYPE } from '../utils/shell';
 import { getActiveDocument } from './copy.utils';
 
@@ -55,7 +55,7 @@ export const createReleaseComponentCommand = (
   }
 
   // locate python executable
-  const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
+  const pythonExec: Uri = await getPythonExecutableV2(wsFolder.uri);
   aChannel.appendLine(`Python Executable [${pythonExec}]`);
 
   // show a message

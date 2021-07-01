@@ -5,15 +5,15 @@ import {
   OutputChannel,
   Uri,
   window,
-  workspace,
+  workspace
 } from 'vscode';
-
 import { createFileLogger } from '../utils/channels';
 import { writeFiles } from '../utils/file';
 import { generatePackage } from '../utils/generate.package';
-import { getPythonExecutable } from '../utils/python.utils';
+import { getPythonExecutableV2 } from '../utils/python.utils';
 import { findRootDir } from '../utils/root.dir';
 import { getActiveDocument } from './copy.utils';
+
 
 function getParentFolder(): Uri | undefined {
   // the current editor
@@ -44,7 +44,7 @@ export const createPackageCommand = (
   }
 
   // locate python executable
-  const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
+  const pythonExec: Uri = await getPythonExecutableV2(wsFolder.uri);
   channel.appendLine(`Python Executable [${pythonExec}]`);
   // current document
   const defaultUri = getParentFolder();

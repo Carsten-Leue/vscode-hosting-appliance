@@ -2,7 +2,7 @@ import { ExtensionContext, OutputChannel, Uri, workspace } from 'vscode';
 
 import { insertImport } from '../utils/insert.import';
 import { Provider, selectProvider } from '../utils/providers';
-import { getPythonExecutable } from '../utils/python.utils';
+import { getPythonExecutableV2 } from '../utils/python.utils';
 import { getActiveDocument } from './copy.utils';
 
 export const createProvidersCommand = (
@@ -20,7 +20,7 @@ export const createProvidersCommand = (
   }
 
   // locate python executable
-  const pythonExec: Uri = getPythonExecutable(wsFolder.uri);
+  const pythonExec: Uri = await getPythonExecutableV2(wsFolder.uri);
   channel.appendLine(`Python Executable [${pythonExec}]`);
 
   const selected: Provider = await selectProvider(pythonExec.fsPath);
